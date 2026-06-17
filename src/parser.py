@@ -19,9 +19,10 @@ REGEX_F1 = re.compile(
 
 REGEX_F2 = re.compile(
     r'\s*(?:([A-Za-zÁÉÍÓÚÑáéíóúñ0-9\+\-\.\(\) ]+)\s*\n)?' 
-    r'(?:Timestamp|Fecha|Date)\s*:\s*(\d{1,2}/\d{1,2}/\d{2,4})\s+(\d{1,2}:\d{2}:\d{2})(?:\s*\(UTC[^)]*\))?\s*\n'
+    r'(?:(?:Timestamp|Fecha|Date)\s*:\s*)?' # Ahora la etiqueta es completamente opcional
+    r'(\d{1,2}/\d{1,2}/\d{2,4})\s+(\d{1,2}:\d{2}:\d{2})(?:\s*(?:AM|PM|am|pm))?(?:\s*\(UTC[^)]*\))?\s*\n' # Soporte AM/PM
     r'(.*?)'
-    r'(?=\n\s*(?:[A-Za-zÁÉÍÓÚÑáéíóúñ0-9\+\-\.\(\) ]+\s*\n)?(?:Timestamp|Fecha|Date)\s*:|\n\s*\[\d{1,2}/|\Z)',
+    r'(?=\n\s*(?:[A-Za-zÁÉÍÓÚÑáéíóúñ0-9\+\-\.\(\) ]+\s*\n)?(?:(?:Timestamp|Fecha|Date)\s*:\s*)?\d{1,2}/\d{1,2}/\d{2,4}|\n\s*\[\d{1,2}/|\Z)',
     re.DOTALL
 )
 
