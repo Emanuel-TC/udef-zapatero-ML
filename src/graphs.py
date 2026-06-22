@@ -1,6 +1,7 @@
 import pandas as pd
 import spacy
 import warnings
+import networkx as nx
 
 class HeterogeneousGraphBuilder:
     """
@@ -78,3 +79,79 @@ class HeterogeneousGraphBuilder:
             return df_grafo.sort_values(by='Peso', ascending=False).reset_index(drop=True)
         
         return pd.DataFrame(columns=["Origen", "Destino", "Tipo_Relacion", "Peso"])
+    
+
+class GraphFeatureExtractor:
+    """
+    Clase responsable de convertir un DataFrame de aristas en un grafo de NetworkX
+    y extraer métricas topológicas (Centralidad, PageRank) para cada nodo.
+    """
+    def __init__(self):
+        # Usaremos un grafo dirigido (DiGraph) porque el flujo de información importa
+        self.G = nx.DiGraph()
+        
+    def _build_networkx_graph(self, df_grafo: pd.DataFrame):
+        """[Método Privado] Construye el objeto grafo en memoria."""
+        self.G.clear()
+        
+        for _, row in df_grafo.iterrows():
+            origen = row['Origen']
+            destino = row['Destino']
+            peso = row['Peso']
+            tipo = row['Tipo_Relacion']
+            
+            # Si la arista ya existe, sumamos el peso al existente y actualizamos el tipo principal
+            if self.G.has_edge(origen, destino):
+                self.G[origen][destino]['weight'] += peso
+            else:
+                self.G.add_edge(origen, destino, weight=peso, type=tipo)
+
+    def extract_features(self, df_grafo: pd.DataFrame) -> pd.DataFrame:
+        """
+        [Método Público] 
+        Calcula las métricas de red y devuelve un DataFrame tabular (Nodos x Features).
+        """
+        print("Calculando métricas topológicas (Feature Engineering)...")
+        self._build_networkx_graph(df_grafo)
+        
+        # 1. Degree Centrality (Popularidad base)
+        # Usamos out_degree y in_degree porque es dirigido
+        in_degree = nx.in_degree_centrality(self.G)
+        out_degree = nx.out_degree_centrality(self.G)
+        
+        # 2. Betweenness Centrality (El perfil del Broker/Intermediario)
+        # Usamos el peso invertido (1/peso) porque en NetworkX 'peso' suele significar 'coste' o 'distancia'
+        # Para nosotros, mayor peso = más cercanos. Así que invertimos.
+        # Aseguramos que el peso no sea 0 para evitar divisiones por cero.
+        for u, v, d in self.G.edges(data=True):
+             d['distance'] = 1.0 / d['weight'] if d['weight'] > 0 else 1.0
+             
+        betweenness = nx.betweenness_centrality(self.G, weight='distance')
+        
+        # 3. PageRank (Importancia jerárquica)
+        pagerank = nx.pagerank(self.G, weight='weight')
+        
+        # 4. HITS (Hubs and Authorities)
+        # Puede fallar si la red no converge, lo envolvemos en un try/except
+        try:
+            hubs, authorities = nx.hits(self.G)
+        except nx.PowerIterationFailedConvergence:
+            print("Advertencia: HITS no convergió. Rellenando con ceros.")
+            hubs = {node: 0.0 for node in self.G.nodes()}
+            authorities = {node: 0.0 for node in self.G.nodes()}
+
+        # Consolidamos todo en un DataFrame
+        features_list = []
+        for node in self.G.nodes():
+            features_list.append({
+                "Nodo": node,
+                "In_Degree": in_degree.get(node, 0.0),
+                "Out_Degree": out_degree.get(node, 0.0),
+                "Betweenness": betweenness.get(node, 0.0),
+                "PageRank": pagerank.get(node, 0.0),
+                "Hub_Score": hubs.get(node, 0.0),
+                "Authority_Score": authorities.get(node, 0.0)
+            })
+            
+        df_features = pd.DataFrame(features_list)
+        return df_features.sort_values(by="PageRank", ascending=False).reset_index(drop=True)

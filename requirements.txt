@@ -7,3 +7,4 @@ spacy==3.8.14
 networkx==3.6.1
 click==8.4.1
 python -m spacy download es_core_news_md
+scipy==1.18.0
