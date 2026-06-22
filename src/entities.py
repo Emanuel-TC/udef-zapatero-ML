@@ -15,11 +15,15 @@ class EntityResolver:
             "ZP": "ZAPATERO",
             "EL ZAPA": "ZAPATERO",
             "ZAPA": "ZAPATERO",
-            "AVALOS": "ABALOS", # Corrige la ortografía de los emisores
+            "AVALOS": "ABALOS", 
             "EL TOCAYO": "JULIO MARTINEZ MARTINEZ",
             "JULITO": "JULIO MARTINEZ MARTINEZ",
             "EL MORITO": "NOURREDINE OUABDESSELAM",
             "RODOMAN": "RODOLFO REYES",
+            "RODOLFO REYES ROJAS": "RODOLFO REYES", # Fix tras exploración de nodos
+            "JULIO MARTINEZ SOLA": "JULIO MARTINEZ SOLA",
+            "JULIO": "JULIO MARTINEZ SOLA", # Fix tras exploración de nodos
+            "ROBERTO ROSELLI MIELE": "ROBERTO ROSELLI", # Fix tras exploración de nodos
             "SANTI": "SANTIAGO FERNANDEZ LENA",
             "DELCY": "DELCY RODRIGUEZ",
             "PEDRO SAURA": "PEDRO SAURA", 
