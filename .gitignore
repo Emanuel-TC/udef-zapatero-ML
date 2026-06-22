@@ -2,3 +2,9 @@
 .env
 data/raw/*
 data/processed/*
+src/__pycache__/*
+
+# Caché de Python (Aplica a cualquier carpeta)
+__pycache__/
+*.py[cod]
+*$py.class
