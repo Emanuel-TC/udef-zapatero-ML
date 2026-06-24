@@ -23,7 +23,7 @@ class TemporalAnomalyDetector:
         self.scaler = StandardScaler()
 
     def prepare_features(self, df: pd.DataFrame) -> pd.DataFrame:
-        print("Realizando Feature Engineering temporal...")
+        print("Realizando Feature Engineering temporal avanzado...")
         df_clean = df.dropna(subset=['Fecha', 'Hora', 'Mensaje']).copy()
         
         df_clean['Datetime'] = pd.to_datetime(
@@ -37,9 +37,14 @@ class TemporalAnomalyDetector:
         df_clean['DayOfWeek'] = df_clean['Datetime'].dt.dayofweek
         df_clean['Is_Weekend'] = df_clean['DayOfWeek'].apply(lambda x: 1 if x >= 5 else 0)
         
-        # Ahora calculamos la longitud directamente sobre el mensaje real
+        # Variables crudas
         df_clean['Message_Length'] = df_clean['Mensaje'].apply(lambda x: len(str(x)))
         df_clean['Time_Delta_Sec'] = df_clean['Datetime'].diff().dt.total_seconds().fillna(0)
+        
+        # TRANSFORMACIÓN MATEMÁTICA
+        # Aplicamos Logaritmo para suavizar los saltos masivos de meses en el sumario
+        df_clean['Time_Delta_Log'] = np.log1p(df_clean['Time_Delta_Sec'])
+        df_clean['Length_Log'] = np.log1p(df_clean['Message_Length'])
         
         return df_clean
 
