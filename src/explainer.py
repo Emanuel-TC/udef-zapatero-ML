@@ -3,7 +3,6 @@ import pandas as pd
 from groq import Groq
 from dotenv import load_dotenv, find_dotenv
 
-# Cargamos las variables de entorno desde la raíz
 load_dotenv(find_dotenv())
 
 class ForensicExplainer:
@@ -15,7 +14,6 @@ class ForensicExplainer:
         self.client = Groq()
         self.model_name = model_name
         
-        # System prompt que define la "personalidad" y el rigor del modelo
         self.system_prompt = (
             "Eres un Analista Experto en Inteligencia Financiera. "
             "Tu tarea es interpretar mensajes extraídos de un sumario policial. "
@@ -25,7 +23,6 @@ class ForensicExplainer:
         )
 
     def _call_groq(self, prompt: str) -> str:
-        """[Método Privado] Maneja la comunicación con la API de Groq."""
         try:
             chat_completion = self.client.chat.completions.create(
                 messages=[
@@ -33,38 +30,38 @@ class ForensicExplainer:
                     {"role": "user", "content": prompt}
                 ],
                 model=self.model_name,
-                temperature=0.2, # Baja temperatura para que sea analítico, no creativo
+                temperature=0.2, 
                 max_tokens=256
             )
             return chat_completion.choices[0].message.content.strip()
         except Exception as e:
             return f"Error en la generación LLM: {str(e)}"
 
-    def explain_broker_profile(self, nombre_broker: str, mensajes_clave: list) -> str:
+    def explain_actor_profile(self, nombre: str, rol_matematico: str, mensajes_clave: list) -> str:
         """
-        [Método Público] Genera un perfil del Broker basándose en sus mensajes.
+        [Método Público] Genera un perfil forense de cualquier actor basado en su etiqueta K-Means.
         """
         mensajes_formateados = "\n".join([f"- {msg}" for msg in mensajes_clave])
         
         prompt = (
-            f"Un modelo matemático de grafos ha identificado a '{nombre_broker}' como un "
-            f"'Broker/Intermediario Clave' en una red de influencias por su alta centralidad de intermediación.\n"
+            f"Un modelo matemático de Machine Learning ha clasificado a '{nombre}' "
+            f"con el rol estructural de '{rol_matematico}' dentro de una red de influencias.\n"
             f"Analiza esta muestra de sus comunicaciones más relevantes:\n{mensajes_formateados}\n\n"
-            f"Redacta una breve conclusión forense (máximo 4 líneas) explicando qué tipo de rol ejerce, "
-            f"con quién conecta y qué tipo de información maneja."
+            f"Redacta una breve conclusión forense (máximo 4 líneas) validando si el contenido "
+            f"de sus mensajes concuerda con este rol, qué tipo de información maneja y su nivel de jerarquía."
         )
         return self._call_groq(prompt)
 
-    def explain_anomaly(self, fecha: str, hora: str, mensaje: str) -> str:
+    def explain_anomaly(self, fecha: str, hora: str, longitud: int, score: float, mensaje: str) -> str:
         """
         [Método Público] Explica por qué un evento temporal es crítico para la investigación.
         """
         prompt = (
-            f"Un modelo de Machine Learning (Isolation Forest) ha marcado el siguiente mensaje como una "
-            f"anomalía crítica de comportamiento dentro de la red temporal de comunicaciones:\n\n"
-            f"Fecha: {fecha}\nHora: {hora}\nMensaje: '{mensaje}'\n\n"
-            f"Analiza el contenido y el contexto (por ejemplo, si ocurre de madrugada o si denota tensión). "
+            f"Un modelo de Isolation Forest ha marcado este evento como una anomalía matemática extrema "
+            f"(Score: {score:.3f}). Ocurrió el {fecha} a las {hora}, con una longitud inusual de {longitud} caracteres:\n\n"
+            f"Mensaje:\n'{mensaje}'\n\n"
+            f"Analiza el contenido y el contexto de los metadatos. "
             f"Redacta una evaluación forense (máximo 4 líneas) justificando por qué este evento refleja "
-            f"una situación de urgencia, presión o coordinación clandestina."
+            f"una situación de crisis, coordinación clandestina o revelación de pruebas clave."
         )
         return self._call_groq(prompt)
