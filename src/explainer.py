@@ -37,31 +37,25 @@ class ForensicExplainer:
         except Exception as e:
             return f"Error en la generación LLM: {str(e)}"
 
-    def explain_actor_profile(self, nombre: str, rol_matematico: str, mensajes_clave: list) -> str:
-        """
-        [Método Público] Genera un perfil forense de cualquier actor basado en su etiqueta K-Means.
-        """
-        mensajes_formateados = "\n".join([f"- {msg}" for msg in mensajes_clave])
-        
+    def explain_actor_profile(self, nombre: str, rol_matematico: str, pagerank: float, mensajes_contexto: list) -> str:
         prompt = (
-            f"Un modelo matemático de Machine Learning ha clasificado a '{nombre}' "
-            f"con el rol estructural de '{rol_matematico}' dentro de una red de influencias.\n"
-            f"Analiza esta muestra de sus comunicaciones más relevantes:\n{mensajes_formateados}\n\n"
-            f"Redacta una breve conclusión forense (máximo 4 líneas) validando si el contenido "
-            f"de sus mensajes concuerda con este rol, qué tipo de información maneja y su nivel de jerarquía."
+            f"Un modelo matemático (K-Means) clasificó a '{nombre}' como '{rol_matematico}' "
+            f"con un nivel de poder (PageRank) de {pagerank:.4f}.\n"
+            f"Analiza esta muestra de sus comunicaciones (incluyendo la Emoción NLP extraída mediante RoBERTa):\n"
+            f"{mensajes_contexto}\n\n"
+            f"Redacta una evaluación forense (máximo 4 líneas). Explica SI su forma de hablar y sus emociones "
+            f"justifican este rol jerárquico. Si es un 'Ejecutor', ¿recibe órdenes? Si es 'Cúpula', ¿da directrices?"
         )
         return self._call_groq(prompt)
 
-    def explain_anomaly(self, fecha: str, hora: str, longitud: int, score: float, mensaje: str) -> str:
-        """
-        [Método Público] Explica por qué un evento temporal es crítico para la investigación.
-        """
+    def explain_anomaly(self, fecha: str, hora: str, longitud: int, score: float, emocion_nlp: str, mensaje: str) -> str:
         prompt = (
-            f"Un modelo de Isolation Forest ha marcado este evento como una anomalía matemática extrema "
-            f"(Score: {score:.3f}). Ocurrió el {fecha} a las {hora}, con una longitud inusual de {longitud} caracteres:\n\n"
-            f"Mensaje:\n'{mensaje}'\n\n"
-            f"Analiza el contenido y el contexto de los metadatos. "
-            f"Redacta una evaluación forense (máximo 4 líneas) justificando por qué este evento refleja "
-            f"una situación de crisis, coordinación clandestina o revelación de pruebas clave."
+            f"Un modelo Isolation Forest marcó este evento como anomalía matemática (Score: {score:.3f}).\n"
+            f"Metadatos: Fecha {fecha}, Hora {hora}, Longitud {longitud} caracteres.\n"
+            f"Modelo NLP (RoBERTa) detectó Emoción: {emocion_nlp.upper()}\n"
+            f"Mensaje: '{mensaje}'\n\n"
+            f"Redacta una evaluación forense (máximo 4 líneas). Usa el contexto de la hora y la EMOCIÓN NLP para no alucinar. "
+            f"Si el mensaje es corto y neutral a las 3 AM, asume que es ruido por hora intempestiva y NO una crisis. "
+            f"Si hay emoción de Miedo/Ira, destaca la urgencia."
         )
         return self._call_groq(prompt)
