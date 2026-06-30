@@ -40,22 +40,26 @@ class ForensicExplainer:
     def explain_actor_profile(self, nombre: str, rol_matematico: str, pagerank: float, mensajes_contexto: list) -> str:
         prompt = (
             f"Un modelo matemático (K-Means) clasificó a '{nombre}' como '{rol_matematico}' "
-            f"con un nivel de poder (PageRank) de {pagerank:.4f}.\n"
-            f"Analiza esta muestra de sus comunicaciones (incluyendo la Emoción NLP extraída mediante RoBERTa):\n"
+            f"con un nivel de jerarquía (PageRank) de {pagerank:.4f}.\n"
+            f"Muestra de comunicaciones y su Emoción NLP (RoBERTa):\n"
             f"{mensajes_contexto}\n\n"
-            f"Redacta una evaluación forense (máximo 4 líneas). Explica SI su forma de hablar y sus emociones "
-            f"justifican este rol jerárquico. Si es un 'Ejecutor', ¿recibe órdenes? Si es 'Cúpula', ¿da directrices?"
+            f"Redacta una evaluación forense (máx 4 líneas). Valida su rol. "
+            f"NOTA FORENSE: Si predominan las emociones 'OTHERS' o Neutras, interprétalo como 'Afecto Plano': "
+            f"un comportamiento típico de operadores de alto nivel que usan un tono frío, corporativo o encriptado "
+            f"para no dejar evidencia emocional, propio de gestiones de lobby o influencia."
         )
         return self._call_groq(prompt)
 
     def explain_anomaly(self, fecha: str, hora: str, longitud: int, score: float, emocion_nlp: str, mensaje: str) -> str:
         prompt = (
-            f"Un modelo Isolation Forest marcó este evento como anomalía matemática (Score: {score:.3f}).\n"
-            f"Metadatos: Fecha {fecha}, Hora {hora}, Longitud {longitud} caracteres.\n"
-            f"Modelo NLP (RoBERTa) detectó Emoción: {emocion_nlp.upper()}\n"
+            f"Un algoritmo Isolation Forest marcó este evento como anomalía matemática crítica (Score: {score:.3f}).\n"
+            f"Fecha {fecha}, Hora {hora}, Longitud {longitud} caracteres.\n"
+            f"Modelo NLP detectó Emoción: {emocion_nlp.upper()}\n"
             f"Mensaje: '{mensaje}'\n\n"
-            f"Redacta una evaluación forense (máximo 4 líneas). Usa el contexto de la hora y la EMOCIÓN NLP para no alucinar. "
-            f"Si el mensaje es corto y neutral a las 3 AM, asume que es ruido por hora intempestiva y NO una crisis. "
-            f"Si hay emoción de Miedo/Ira, destaca la urgencia."
+            f"Redacta una evaluación forense (máx 4 líneas). "
+            f"REGLA CRÍTICA: En inteligencia financiera, una emoción 'OTHERS' (Neutra) cruzada con una anomalía matemática "
+            f"(como escribir 1000 caracteres a horas atípicas o usar intermediarios) es el mayor indicador de "
+            f"COORDINACIÓN CLANDESTINA CALCULADA o LENGUAJE CODIFICADO. No lo descartes como ruido. "
+            f"Explica qué gestión crítica o presión refleja el texto basándote en esto."
         )
         return self._call_groq(prompt)
