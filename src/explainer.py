@@ -37,31 +37,29 @@ class ForensicExplainer:
         except Exception as e:
             return f"Error en la generación LLM: {str(e)}"
 
-    def explain_actor_profile(self, nombre: str, rol_matematico: str, mensajes_clave: list) -> str:
-        """
-        [Método Público] Genera un perfil forense de cualquier actor basado en su etiqueta K-Means.
-        """
-        mensajes_formateados = "\n".join([f"- {msg}" for msg in mensajes_clave])
-        
+    def explain_actor_profile(self, nombre: str, rol_matematico: str, pagerank: float, mensajes_contexto: list) -> str:
         prompt = (
-            f"Un modelo matemático de Machine Learning ha clasificado a '{nombre}' "
-            f"con el rol estructural de '{rol_matematico}' dentro de una red de influencias.\n"
-            f"Analiza esta muestra de sus comunicaciones más relevantes:\n{mensajes_formateados}\n\n"
-            f"Redacta una breve conclusión forense (máximo 4 líneas) validando si el contenido "
-            f"de sus mensajes concuerda con este rol, qué tipo de información maneja y su nivel de jerarquía."
+            f"Un modelo matemático (K-Means) clasificó a '{nombre}' como '{rol_matematico}' "
+            f"con un nivel de jerarquía (PageRank) de {pagerank:.4f}.\n"
+            f"Muestra de comunicaciones y su Emoción NLP (RoBERTa):\n"
+            f"{mensajes_contexto}\n\n"
+            f"Redacta una evaluación forense (máx 4 líneas). Valida su rol. "
+            f"NOTA FORENSE: Si predominan las emociones 'OTHERS' o Neutras, interprétalo como 'Afecto Plano': "
+            f"un comportamiento típico de operadores de alto nivel que usan un tono frío, corporativo o encriptado "
+            f"para no dejar evidencia emocional, propio de gestiones de lobby o influencia."
         )
         return self._call_groq(prompt)
 
-    def explain_anomaly(self, fecha: str, hora: str, longitud: int, score: float, mensaje: str) -> str:
-        """
-        [Método Público] Explica por qué un evento temporal es crítico para la investigación.
-        """
+    def explain_anomaly(self, fecha: str, hora: str, longitud: int, score: float, emocion_nlp: str, mensaje: str) -> str:
         prompt = (
-            f"Un modelo de Isolation Forest ha marcado este evento como una anomalía matemática extrema "
-            f"(Score: {score:.3f}). Ocurrió el {fecha} a las {hora}, con una longitud inusual de {longitud} caracteres:\n\n"
-            f"Mensaje:\n'{mensaje}'\n\n"
-            f"Analiza el contenido y el contexto de los metadatos. "
-            f"Redacta una evaluación forense (máximo 4 líneas) justificando por qué este evento refleja "
-            f"una situación de crisis, coordinación clandestina o revelación de pruebas clave."
+            f"Un algoritmo Isolation Forest marcó este evento como anomalía matemática crítica (Score: {score:.3f}).\n"
+            f"Fecha {fecha}, Hora {hora}, Longitud {longitud} caracteres.\n"
+            f"Modelo NLP detectó Emoción: {emocion_nlp.upper()}\n"
+            f"Mensaje: '{mensaje}'\n\n"
+            f"Redacta una evaluación forense (máx 4 líneas). "
+            f"REGLA CRÍTICA: En inteligencia financiera, una emoción 'OTHERS' (Neutra) cruzada con una anomalía matemática "
+            f"(como escribir 1000 caracteres a horas atípicas o usar intermediarios) es el mayor indicador de "
+            f"COORDINACIÓN CLANDESTINA CALCULADA o LENGUAJE CODIFICADO. No lo descartes como ruido. "
+            f"Explica qué gestión crítica o presión refleja el texto basándote en esto."
         )
         return self._call_groq(prompt)
